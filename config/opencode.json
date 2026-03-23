@@ -1,0 +1,15 @@
+{
+  "server": {
+    "port": 3000,
+    "hostname": "0.0.0.0",
+    "cors": []
+  },
+  "providers": {},
+  "autoCompact": true,
+  "options": {
+    "context_paths": ["/app/projects"],
+    "tui": {
+      "compact_mode": false
+    }
+  }
+}
