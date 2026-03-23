@@ -21,10 +21,11 @@ ENV PATH="/root/.bun/bin:${PATH}"
 
 # Install Crush (OpenCode) from official source
 # Crush is the successor to OpenCode
-RUN curl -fsSL https://raw.githubusercontent.com/charmbracelet/crush/main/install.sh | bash
+RUN curl -fsSL https://raw.githubusercontent.com/charmbracelet/crush/main/install.sh | bash || \
+    (echo "Installing crush via go..." && go install github.com/charmbracelet/crush@latest)
 
-# Ensure crush is in PATH
-ENV PATH="/usr/local/bin:${PATH}"
+# Add Go bin and crush to PATH
+ENV PATH="/root/go/bin:/usr/local/bin:${PATH}"
 
 # Create workspace
 WORKDIR /app

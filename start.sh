@@ -88,8 +88,23 @@ else
     echo "⚠️ No OPENCODE_GO_API_KEY provided, skipping oh-my-opencode auto-config"
 fi
 
-echo "🌐 Starting OpenCode Web Server..."
+echo "🌐 Starting OpenCode/Crush Web Server..."
 echo "📍 Server will be available at: http://0.0.0.0:$PORT"
 
-# Start OpenCode Web
-exec opencode web --port "$PORT" --hostname 0.0.0.0
+# Check if crush or opencode is available
+if command -v crush &> /dev/null; then
+    CMD="crush"
+elif command -v opencode &> /dev/null; then
+    CMD="opencode"
+else
+    echo "❌ ERROR: Neither 'crush' nor 'opencode' found in PATH"
+    echo "PATH: $PATH"
+    ls -la /usr/local/bin/ || true
+    ls -la /root/go/bin/ || true
+    exit 1
+fi
+
+echo "✅ Using command: $CMD"
+
+# Start Web Server
+exec $CMD web --port "$PORT" --hostname 0.0.0.0
