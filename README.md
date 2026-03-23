@@ -2,22 +2,26 @@
 
 OpenCode Web UI с Volume для persistence.
 
-## Структура
+## Настройка Volume (Обязательно!)
 
-- `/data/projects` — рабочие проекты (сохраняются в Volume)
-- `/data/.config/opencode` — конфигурация OpenCode (сохраняется в Volume)
+После первого деплоя:
+
+1. Открой Railway Dashboard → твой проект
+2. Перейди во вкладку **Volumes**
+3. Нажми **New Volume**
+4. **Mount Path**: `/data`
+5. Перезадеплой сервис
+
+## Структура данных
+
+- `/data/projects` — рабочие проекты
+- `/data/.config/opencode` — конфигурация OpenCode
 
 ## Переменные окружения
 
-- `OPENCODE_SERVER_PASSWORD` — пароль для доступа (опционально)
-- `OPENCODE_GO_API_KEY` — API ключ для OpenCode Go провайдера
-
-## Деплой
-
-1. Подключи репозиторий к Railway
-2. Добавь переменные окружения
-3. Volume `/data` создастся автоматически
+- `OPENCODE_SERVER_PASSWORD` — пароль для доступа
+- `OPENCODE_GO_API_KEY` — API ключ OpenCode Go
 
 ## Доступ
 
-После деплоя открой публичный URL — это Web UI OpenCode.
+Открой публичный URL после деплоя — это Web UI OpenCode.
