@@ -1,74 +1,49 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Starting OpenCode Server on Railway..."
+echo "🚀 Starting OpenCode Web Server..."
 
 PORT=${PORT:-3000}
 echo "📡 Port: $PORT"
 
-# Verify opencode is available
+# Verify opencode
 if ! command -v opencode &> /dev/null; then
-    echo "❌ ERROR: opencode not found in PATH!"
-    echo "PATH: $PATH"
-    ls -la /usr/local/bin/ /root/.local/bin/ 2>/dev/null || true
+    echo "❌ ERROR: opencode not found!"
     exit 1
 fi
 
-echo "✅ OpenCode found: $(which opencode)"
-opencode --version || echo "Version check skipped"
+echo "✅ OpenCode: $(which opencode)"
 
-# Create config directory
-mkdir -p /root/.config/opencode
+# Config paths (using /data for persistence)
+CONFIG_DIR="/data/.config/opencode"
+CONFIG_FILE="$CONFIG_DIR/opencode.json"
+mkdir -p "$CONFIG_DIR"
 
-# Generate config
-cat > /root/.config/opencode/opencode.json <<EOF
+# Generate config if not exists
+if [ ! -f "$CONFIG_FILE" ]; then
+    cat > "$CONFIG_FILE" <<EOF
 {
   "server": {
     "port": $PORT,
-    "hostname": "0.0.0.0",
-    "cors": []
+    "hostname": "0.0.0.0"
   },
-  "providers": {
-    "opencode-go": {
-      "id": "opencode-go",
-      "name": "OpenCode Go",
-      "type": "openai",
-      "base_url": "https://api.opencode.ai/v1",
-      "api_key": "${OPENCODE_GO_API_KEY:-}",
-      "models": [
-        {"id": "glm-5", "name": "GLM-5"},
-        {"id": "kimi-k2.5", "name": "Kimi K2.5"},
-        {"id": "minimax-m2.5", "name": "MiniMax M2.5"}
-      ]
-    }
-  },
-  "defaultProvider": "opencode-go",
-  "defaultModel": "kimi-k2.5",
+  "providers": {},
   "autoCompact": true,
   "options": {
-    "context_paths": ["/app/projects"]
+    "context_paths": ["/data/projects"]
   }
 }
 EOF
-
-echo "✅ Configuration created"
+    echo "✅ Config created at $CONFIG_FILE"
+else
+    echo "✅ Using existing config"
+fi
 
 # Set auth if provided
 if [ -n "$OPENCODE_SERVER_PASSWORD" ]; then
     echo "🔒 Authentication enabled"
     export OPENCODE_SERVER_USERNAME="${OPENCODE_SERVER_USERNAME:-opencode}"
-else
-    echo "⚠️ No password set - server will be open"
 fi
 
-# Run oh-my-opencode installer
-if [ -n "$OPENCODE_GO_API_KEY" ]; then
-    echo "🔧 Configuring oh-my-opencode..."
-    bunx oh-my-opencode install --no-tui \
-        --claude=no --openai=no --gemini=no --copilot=no \
-        --opencode-go=yes --opencode-zen=no --zai-coding-plan=no 2>&1 || \
-        echo "oh-my-opencode completed with warnings"
-fi
-
-echo "🌐 Starting OpenCode Web Server on port $PORT..."
+echo "🌐 Starting on port $PORT..."
 exec opencode web --port "$PORT" --hostname 0.0.0.0
